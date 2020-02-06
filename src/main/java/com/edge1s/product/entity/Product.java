@@ -1,35 +1,32 @@
 package com.edge1s.product.entity;
 
-import com.edge1s.product.Type;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
     private String name;
     @NotNull
     private String description;
-    @NotNull
+    @ManyToOne
     private Type type;
     @NotNull
+    @PositiveOrZero
     private BigDecimal price;
     @NotNull
+    @PositiveOrZero
     private Integer views;
 }
