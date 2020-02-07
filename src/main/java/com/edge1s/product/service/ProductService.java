@@ -23,6 +23,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final TypeRepository typeRepository;
 
+    private Integer initialViews = 0;
+
     public List<ProductDTO> getProducts() {
         return productRepository.findAll().stream().map(ProductDTO::new).collect(Collectors.toList());
     }
@@ -70,7 +72,7 @@ public class ProductService {
                     .description(productDTO.getDescription())
                     .type(optionalType.get())
                     .price(productDTO.getPrice())
-                    .views(0)
+                    .views(initialViews)
                     .build();
             productRepository.save(product);
         } else {
