@@ -6,7 +6,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -25,5 +25,5 @@ public class Type {
     @Max(100)
     private int discountInPercent;
     @OneToMany(mappedBy = "type")
-    private List<Product> products;
+    private Set<Product> products;
 }
