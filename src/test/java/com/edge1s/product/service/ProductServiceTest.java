@@ -23,8 +23,8 @@ class ProductServiceTest {
 
     private ProductRepository productRepository = Mockito.mock(ProductRepository.class);
     private TypeRepository typeRepository = Mockito.mock(TypeRepository.class);
-    private DiscountService discountService = Mockito.mock(DiscountService.class);
-    private ViewService viewService = Mockito.mock(ViewService.class);
+    private DiscountService discountService = new DiscountService();
+    private ViewService viewService = new ViewService();
     private ProductService productService = new ProductService(productRepository, typeRepository, discountService, viewService);
     private ArgumentCaptor<Product> productArgumentCaptor = ArgumentCaptor.forClass(Product.class);
     private ArgumentCaptor<Long> idArgumentCaptor = ArgumentCaptor.forClass(Long.class);
@@ -55,6 +55,7 @@ class ProductServiceTest {
         assertEquals("This is test product", capturedProduct.getDescription());
         assertEquals(male, capturedProduct.getType());
         assertEquals(BigDecimal.valueOf(100), capturedProduct.getPrice());
+        assertEquals(0, capturedProduct.getViews());
     }
 
     @Test
@@ -131,7 +132,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void shouldReturnProductAndIncreaseViews() {
+    void shouldReturnProduct() {
         //given
         Product product2 = Product.builder()
                 .id(2L)
