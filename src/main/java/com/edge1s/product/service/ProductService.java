@@ -8,7 +8,6 @@ import com.edge1s.product.exception.TypeNotFoundException;
 import com.edge1s.product.repository.ProductRepository;
 import com.edge1s.product.repository.TypeRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,26 +15,28 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final TypeRepository typeRepository;
-
-    private Integer initialViews = 0;
+    private final DiscountService discountService;
+    private final ViewService viewService;
 
     public List<ProductDTO> getProducts() {
-        return productRepository.findAll().stream().map(ProductDTO::new).collect(Collectors.toList());
+        return productRepository.findAll().stream()
+                .map(ProductDTO::new)
+                .peek(productDTO -> productDTO.setPrice(discountService.calculateTheDiscountPrice(productDTO)))
+                .collect(Collectors.toList());
     }
 
     public ProductDTO getProduct(Long id) {
-
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             ProductDTO productDTO = new ProductDTO(optionalProduct.get());
-            productDTO.increaseViews();
+            productDTO = viewService.increaseViews(productDTO);
             editProduct(productDTO, id);
+            productDTO.setPrice(discountService.calculateTheDiscountPrice(productDTO));
             return productDTO;
         } else {
             throw new ProductNotFoundException(id);
@@ -67,6 +68,7 @@ public class ProductService {
     public void createProduct(ProductDTO productDTO) {
         Optional<Type> optionalType = typeRepository.findByName(productDTO.getType());
         if (optionalType.isPresent()) {
+            Integer initialViews = 0;
             Product product = Product.builder()
                     .name(productDTO.getName())
                     .description(productDTO.getDescription())

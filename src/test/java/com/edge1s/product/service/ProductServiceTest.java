@@ -23,7 +23,9 @@ class ProductServiceTest {
 
     private ProductRepository productRepository = Mockito.mock(ProductRepository.class);
     private TypeRepository typeRepository = Mockito.mock(TypeRepository.class);
-    private ProductService productService = new ProductService(productRepository, typeRepository);
+    private DiscountService discountService = Mockito.mock(DiscountService.class);
+    private ViewService viewService = Mockito.mock(ViewService.class);
+    private ProductService productService = new ProductService(productRepository, typeRepository, discountService, viewService);
     private ArgumentCaptor<Product> productArgumentCaptor = ArgumentCaptor.forClass(Product.class);
     private ArgumentCaptor<Long> idArgumentCaptor = ArgumentCaptor.forClass(Long.class);
 
