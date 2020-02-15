@@ -29,5 +29,5 @@ public class Product {
     private BigDecimal price;
     @NotNull
     @PositiveOrZero
-    private Integer views;
+    private Long views;
 }

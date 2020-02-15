@@ -34,8 +34,7 @@ public class ProductService {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             ProductDTO productDTO = new ProductDTO(optionalProduct.get());
-            productDTO = viewService.increaseViews(productDTO);
-            editProduct(productDTO, id);
+            viewService.increaseViews(id);
             productDTO.setPrice(discountService.calculateTheDiscountPrice(productDTO));
             return productDTO;
         } else {
@@ -53,7 +52,6 @@ public class ProductService {
                         .description(productDTO.getDescription())
                         .type(optionalType.get())
                         .price(productDTO.getPrice())
-                        .views(productDTO.getViews())
                         .build();
                 productRepository.save(product);
             } else {
@@ -68,7 +66,7 @@ public class ProductService {
     public void createProduct(ProductDTO productDTO) {
         Optional<Type> optionalType = typeRepository.findByName(productDTO.getType());
         if (optionalType.isPresent()) {
-            Integer initialViews = 0;
+            Long initialViews = 0L;
             Product product = Product.builder()
                     .name(productDTO.getName())
                     .description(productDTO.getDescription())

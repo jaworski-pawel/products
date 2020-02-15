@@ -16,18 +16,14 @@ public class ProductDTO {
     private String name;
     private String description;
     private String type;
-    private Integer discount;
     private BigDecimal price;
-    private Integer views;
 
     public ProductDTO(Product product) {
         this.id = product.getId();
         this.name = product.getName();
         this.description = product.getDescription();
         this.type = product.getType().getName();
-        this.discount = product.getType().getDiscountInPercent();
         this.price = (product.getPrice());
-        this.views = product.getViews();
     }
 
 }

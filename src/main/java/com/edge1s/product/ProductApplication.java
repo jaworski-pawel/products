@@ -1,6 +1,8 @@
 package com.edge1s.product;
 
+import com.edge1s.product.entity.Discount;
 import com.edge1s.product.entity.Type;
+import com.edge1s.product.repository.DiscountRepository;
 import com.edge1s.product.repository.TypeRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -15,22 +17,30 @@ public class ProductApplication {
     }
 
     @Bean
-    CommandLineRunner init(TypeRepository typeRepository) {
+    CommandLineRunner init(TypeRepository typeRepository, DiscountRepository discountRepository) {
         return args -> {
             Type male = new Type();
             male.setName("MALE");
-            male.setDiscountInPercent(5);
             typeRepository.save(male);
 
             Type female = new Type();
             female.setName("FEMALE");
-            female.setDiscountInPercent(5);
             typeRepository.save(female);
 
             Type kid = new Type();
             kid.setName("KID");
-            kid.setDiscountInPercent(10);
             typeRepository.save(kid);
+
+            Discount small = Discount.builder()
+                    .name("small")
+                    .discountInPercent(3)
+                    .build();
+            discountRepository.save(small);
+            Discount big = Discount.builder()
+                    .name("big")
+                    .discountInPercent(5)
+                    .build();
+            discountRepository.save(big);
         };
     }
 
