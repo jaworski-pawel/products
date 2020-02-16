@@ -1,6 +1,7 @@
 package com.edge1s.product.service;
 
 import com.edge1s.product.dto.ProductDTO;
+import com.edge1s.product.entity.Discount;
 import com.edge1s.product.entity.Product;
 import com.edge1s.product.entity.Type;
 import com.edge1s.product.exception.ProductNotFoundException;
@@ -127,25 +128,25 @@ class ProductServiceTest {
         assertEquals("product2", secondProduct.getName());
         assertEquals("description2", secondProduct.getDescription());
         assertEquals("FEMALE", secondProduct.getType());
-        assertEquals(BigDecimal.valueOf(190.00).setScale(2, RoundingMode.UP), secondProduct.getPrice());
-//        assertEquals(5, secondProduct.getViews());
+        assertEquals(BigDecimal.valueOf(200.00).setScale(2, RoundingMode.UP), secondProduct.getPrice());
     }
 
     @Test
-    void shouldReturnProduct() {
+    void shouldReturnProductWithoutDiscount() {
         //given
         Product product2 = Product.builder()
                 .id(2L)
                 .name("product2")
                 .description("description2")
                 .type(Type.builder().id(1L).name("FEMALE").build())
-                .price(BigDecimal.valueOf(200))
+                .price(BigDecimal.valueOf(499.99))
                 .views(5L)
                 .build();
 
-        Mockito.when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
         Mockito.when(typeRepository.findByName("FEMALE"))
                 .thenReturn(Optional.of(Type.builder().id(1L).name("FEMALE").build()));
+        Mockito.when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
+        Mockito.when(productRepository.getViewsById(2L)).thenReturn(Optional.of(5L));
 
         //when
         ProductDTO productDTO = productService.getProduct(2L);
@@ -154,8 +155,91 @@ class ProductServiceTest {
         assertEquals("product2", productDTO.getName());
         assertEquals("description2", productDTO.getDescription());
         assertEquals("FEMALE", productDTO.getType());
-        assertEquals(BigDecimal.valueOf(190.00).setScale(2, RoundingMode.UP), productDTO.getPrice());
-//        assertEquals(6, productDTO.getViews());
+        assertEquals(BigDecimal.valueOf(499.99).setScale(2, RoundingMode.UP), productDTO.getPrice());
+    }
+
+    @Test
+    void shouldReturnProductWithSmallDiscount() {
+        //given
+        Product product1 = Product.builder()
+                .id(1L)
+                .name("product1")
+                .description("description1")
+                .type(Type.builder().id(1L).name("MALE").build())
+                .price(BigDecimal.valueOf(500.00))
+                .views(0L)
+                .build();
+        Product product2 = Product.builder()
+                .id(2L)
+                .name("product2")
+                .description("description2")
+                .type(Type.builder().id(2L).name("FEMALE").build())
+                .price(BigDecimal.valueOf(1999.99))
+                .views(0L)
+                .build();
+
+        Mockito.when(typeRepository.findByName("MALE"))
+                .thenReturn(Optional.of(Type.builder().id(1L).name("MALE").build()));
+        Mockito.when(typeRepository.findByName("FEMALE"))
+                .thenReturn(Optional.of(Type.builder().id(2L).name("FEMALE").build()));
+        Mockito.when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        Mockito.when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
+        Mockito.when(productRepository.getViewsById(1L)).thenReturn(Optional.of(0L));
+        Mockito.when(productRepository.getViewsById(2L)).thenReturn(Optional.of(0L));
+        Mockito.when(discountRepository.findByName("small"))
+                .thenReturn(Optional.of(Discount.builder().id(1L).name("small").discountInPercent(3).build()));
+
+        //when
+        ProductDTO productDTO1 = productService.getProduct(1L);
+        ProductDTO productDTO2 = productService.getProduct(2L);
+
+        //then
+        assertEquals("product1", productDTO1.getName());
+        assertEquals("product2", productDTO2.getName());
+        assertEquals(BigDecimal.valueOf(485.00).setScale(2, RoundingMode.UP), productDTO1.getPrice());
+        assertEquals(BigDecimal.valueOf(1940.00).setScale(2, RoundingMode.UP), productDTO2.getPrice());
+    }
+
+    @Test
+    void shouldReturnProductWithBigDiscount() {
+        //given
+        Product product1 = Product.builder()
+                .id(1L)
+                .name("product1")
+                .description("description1")
+                .type(Type.builder().id(1L).name("MALE").build())
+                .price(BigDecimal.valueOf(2000.00))
+                .views(0L)
+                .build();
+        Product product2 = Product.builder()
+                .id(2L)
+                .name("product2")
+                .description("description2")
+                .type(Type.builder().id(2L).name("FEMALE").build())
+                .price(BigDecimal.valueOf(3000.00))
+                .views(0L)
+                .build();
+
+        Mockito.when(typeRepository.findByName("MALE"))
+                .thenReturn(Optional.of(Type.builder().id(1L).name("MALE").build()));
+        Mockito.when(typeRepository.findByName("FEMALE"))
+                .thenReturn(Optional.of(Type.builder().id(2L).name("FEMALE").build()));
+        Mockito.when(productRepository.findById(1L)).thenReturn(Optional.of(product1));
+        Mockito.when(productRepository.findById(2L)).thenReturn(Optional.of(product2));
+        Mockito.when(productRepository.getViewsById(1L)).thenReturn(Optional.of(0L));
+        Mockito.when(productRepository.getViewsById(2L)).thenReturn(Optional.of(0L));
+        Mockito.when(discountRepository.findByName("big"))
+                .thenReturn(Optional.of(Discount.builder().id(1L).name("big").discountInPercent(5).build()));
+
+        //when
+        ProductDTO productDTO1 = productService.getProduct(1L);
+        ProductDTO productDTO2 = productService.getProduct(2L);
+
+        //then
+        assertEquals("product1", productDTO1.getName());
+        assertEquals("product2", productDTO2.getName());
+        assertEquals(BigDecimal.valueOf(1900.00).setScale(2, RoundingMode.UP), productDTO1.getPrice());
+        assertEquals(BigDecimal.valueOf(2850.00).setScale(2, RoundingMode.UP), productDTO2.getPrice());
     }
 
     @Test
@@ -319,5 +403,4 @@ class ProductServiceTest {
         //then
         assertTrue(actualMessage.contains(expectedMessage));
     }
-
 }

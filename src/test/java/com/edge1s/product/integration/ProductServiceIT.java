@@ -3,6 +3,7 @@ package com.edge1s.product.integration;
 import com.edge1s.product.dto.ProductDTO;
 import com.edge1s.product.repository.ProductRepository;
 import com.edge1s.product.service.ProductService;
+import com.edge1s.product.service.ViewService;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,9 @@ class ProductServiceIT {
     private ProductService productService;
 
     @Autowired
+    private ViewService viewService;
+
+    @Autowired
     private ProductRepository productRepository;
 
     @Before
@@ -37,7 +41,7 @@ class ProductServiceIT {
                 .name("Test Product")
                 .description("This is test product")
                 .type("MALE")
-                .price(BigDecimal.valueOf(100))
+                .price(BigDecimal.valueOf(2000))
                 .build();
         productService.createProduct(existProduct);
 
@@ -50,7 +54,7 @@ class ProductServiceIT {
         assertEquals("Test Product", resultProduct.getName());
         assertEquals("This is test product", resultProduct.getDescription());
         assertEquals("MALE", resultProduct.getType());
-        assertEquals(BigDecimal.valueOf(95).setScale(2, RoundingMode.UP), resultProduct.getPrice());
-//        assertEquals(Integer.valueOf(3), resultProduct.getViews());
+        assertEquals(BigDecimal.valueOf(1900).setScale(2, RoundingMode.UP), resultProduct.getPrice());
+        assertEquals(Long.valueOf(3), viewService.getViews(1L));
     }
 }
